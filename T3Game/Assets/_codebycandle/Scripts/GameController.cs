@@ -11,10 +11,8 @@ public class GameController : MonoBehaviour
     #region VARIABLE
     public TMP_Text[] buttonList;
 
-    private const string player1Name = "X";
-    private const string player2Name = "O";
-
-    private string playerSide = player1Name;
+    [SerializeField] private GameObject gameOverPanel;
+    [SerializeField] private TMP_Text gameOverText;
 
     private readonly Dictionary<string, List<int>> winDict = new()
     {
@@ -29,6 +27,11 @@ public class GameController : MonoBehaviour
         { "diag1", new List<int>(){0, 4, 8 } },
         { "diag2", new List<int>(){2, 4, 6 } },
     };
+
+    private const string player1Name = "X";
+    private const string player2Name = "O";
+
+    private string playerSide = player1Name;
     #endregion
 
     #region METHOD - PUBLIC
@@ -55,17 +58,28 @@ public class GameController : MonoBehaviour
         {
             buttonList[i].GetComponentInParent<Button>().interactable = false;
         }
+
+        EnableGameOverPanel(true);
+
+        gameOverText.text = playerSide + " Wins!";
     }
     #endregion
 
     #region METHOD - MONOBEHAVIOUR
     private void Awake()
     {
+        EnableGameOverPanel(false);
+
         InitButtons();
     }
     #endregion
 
     #region METHOD - PRIVATE
+    private void EnableGameOverPanel(bool enable)
+    {
+        gameOverPanel.SetActive(enable);
+    }
+
     private void InitButtons()
     {
         for (int i = 0; i < buttonList.Length; i++)
