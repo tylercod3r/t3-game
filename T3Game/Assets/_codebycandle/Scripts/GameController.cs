@@ -9,7 +9,7 @@ using UnityEngine.UI;
 public class GameController : MonoBehaviour
 {
     #region VARIABLE
-    public TMP_Text[] buttonList;
+    public TMP_Text[] buttonLabelList;
 
     [SerializeField] private GameObject gameOverPanel;
     [SerializeField] private TMP_Text gameOverText;
@@ -67,14 +67,20 @@ public class GameController : MonoBehaviour
 
     public void EndGame(string endText)
     {
-        for (int i = 0; i < buttonList.Length; i++)
-        {
-            buttonList[i].GetComponentInParent<Button>().interactable = false;
-        }
+        EnableBoard(false);
 
         EnableGameOverPanel(true);
 
         gameOverText.text = endText;
+    }
+
+    public void RestartGame()
+    {
+        playerSide = player1Name;
+        moveCount = 0;
+        gameOverPanel.SetActive(false);
+
+        EnableBoard(true);
     }
     #endregion
 
@@ -88,6 +94,19 @@ public class GameController : MonoBehaviour
     #endregion
 
     #region METHOD - PRIVATE
+    private void EnableBoard(bool enable)
+    {
+        for (int i = 0; i < buttonLabelList.Length; i++)
+        {
+            buttonLabelList[i].GetComponentInParent<Button>().interactable = enable;
+
+            if(enable)
+            {
+                buttonLabelList[i].text = "";
+            }
+        }
+    }
+
     private void EnableGameOverPanel(bool enable)
     {
         gameOverPanel.SetActive(enable);
@@ -95,9 +114,9 @@ public class GameController : MonoBehaviour
 
     private void InitButtons()
     {
-        for (int i = 0; i < buttonList.Length; i++)
+        for (int i = 0; i < buttonLabelList.Length; i++)
         {
-            buttonList[i].GetComponentInParent<GridSpace>().SetGameController(this);
+            buttonLabelList[i].GetComponentInParent<GridSpace>().SetGameController(this);
         }
     }
 
@@ -110,9 +129,9 @@ public class GameController : MonoBehaviour
             if (winDict.ContainsKey(key))
             {
                 var values = winDict[key];
-                if (buttonList[values[0]].text == playerSide
-                    && buttonList[values[1]].text == playerSide
-                    && buttonList[values[2]].text == playerSide)
+                if (buttonLabelList[values[0]].text == playerSide
+                    && buttonLabelList[values[1]].text == playerSide
+                    && buttonLabelList[values[2]].text == playerSide)
                 {
                     Debug.Log(playerSide + " won by: " + key);
 
