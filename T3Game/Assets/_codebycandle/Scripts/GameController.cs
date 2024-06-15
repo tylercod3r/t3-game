@@ -28,10 +28,17 @@ public class GameController : MonoBehaviour
         { "diag2", new List<int>(){2, 4, 6 } },
     };
 
+    private readonly string winText = " Wins!";
+    private readonly string drawText = "It's a Draw!";
+
     private const string player1Name = "X";
     private const string player2Name = "O";
+    
+    private const int maxMoveCount = 9;
 
     private string playerSide = player1Name;
+
+    private int moveCount;
     #endregion
 
     #region METHOD - PUBLIC
@@ -42,9 +49,15 @@ public class GameController : MonoBehaviour
 
     public void EndTurn()
     {
+        moveCount++;
+
         if (CheckWin())
         {
-            EndGame();
+            EndGame(playerSide + winText);
+        }
+        else if (moveCount >= maxMoveCount)
+        {
+            EndGame(drawText);
         }
         else
         {
@@ -52,7 +65,7 @@ public class GameController : MonoBehaviour
         }
     }
 
-    public void EndGame()
+    public void EndGame(string endText)
     {
         for (int i = 0; i < buttonList.Length; i++)
         {
@@ -61,7 +74,7 @@ public class GameController : MonoBehaviour
 
         EnableGameOverPanel(true);
 
-        gameOverText.text = playerSide + " Wins!";
+        gameOverText.text = endText;
     }
     #endregion
 
