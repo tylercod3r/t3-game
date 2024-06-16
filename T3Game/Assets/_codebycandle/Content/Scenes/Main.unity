@@ -1394,8 +1394,6 @@ MonoBehaviour:
   playerO:
     panel: {fileID: 241951649}
     text: {fileID: 814469341}
-  playerMove: 0
-  delay: 10
 --- !u!1 &906796200
 GameObject:
   m_ObjectHideFlags: 0
@@ -2058,7 +2056,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1161351399
 RectTransform:
   m_ObjectHideFlags: 0

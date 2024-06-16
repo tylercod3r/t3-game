@@ -7,40 +7,42 @@ using UnityEngine;
 using UnityEngine.UI;
 #endregion
 
-[System.Serializable]
-public class Player
+namespace Codebycandle.T3Game
 {
-    public Image panel;
-    public TMP_Text text;
-}
+    [System.Serializable]
+    public class Player
+    {
+        public Image panel;
+        public TMP_Text text;
+    }
 
-[System.Serializable]
-public class PlayerColor
-{
-    public Color panelColor;
-    public Color textColor;
-}
+    [System.Serializable]
+    public class PlayerColor
+    {
+        public Color panelColor;
+        public Color textColor;
+    }
 
-public class GameController : MonoBehaviour
-{
-    #region VARIABLE
-    public bool MultiPlayerMode { get; private set; }
-    public bool PlayerMove { get; private set; }
+    public class GameController : MonoBehaviour
+    {
+        #region VARIABLE
+        public bool MultiPlayerMode { get; private set; }
+        public bool PlayerMove { get; private set; }
 
-    public TMP_Text[] buttonLabelList;
+        [SerializeField] private GameObject gameStartPanel;
+        [SerializeField] private GameObject gameOverPanel;
+        [SerializeField] private TMP_Text gameOverText;
+        [SerializeField] private GameObject playerIndicator;
 
-    public PlayerColor activePlayerColor;
-    public PlayerColor inactivePlayerColor;
+        [SerializeField] private Player playerX;
+        [SerializeField] private Player playerO;
 
-    [SerializeField] private GameObject gameStartPanel;
-    [SerializeField] private GameObject gameOverPanel;
-    [SerializeField] private TMP_Text gameOverText;
-    [SerializeField] private GameObject playerIndicator;
+        [SerializeField] private TMP_Text[] buttonLabelList;
 
-    [SerializeField] private Player playerX;
-    [SerializeField] private Player playerO;
+        [SerializeField] private PlayerColor activePlayerColor;
+        [SerializeField] private PlayerColor inactivePlayerColor;
 
-    private readonly Dictionary<string, List<int>> winDict = new()
+        private readonly Dictionary<string, List<int>> winDict = new()
     {
         { "row1", new List<int>(){0, 1, 2 } },
         { "row2", new List<int>(){3, 4, 5 } },
@@ -54,249 +56,250 @@ public class GameController : MonoBehaviour
         { "diag2", new List<int>(){2, 4, 6 } },
     };
 
-    private const string winText = " Wins!";
-    private const string drawText = "It's a Draw!";
-    private const string player1Name = "X";
-    private const string player2Name = "O";
-    private const string computerName = "C";
-    private const int maxMoveCount = 9;
-    private const int computerMoveDelaySeconds = 1;
-    private const string computerSide = computerName;
+        private const string winText = " Wins!";
+        private const string drawText = "It's a Draw!";
+        private const string player1Name = "X";
+        private const string player2Name = "O";
+        private const string computerName = "C";
+        private const string computerSide = computerName;
+        private const int maxMoveCount = 9;
+        private const int computerMoveDelaySeconds = 1;
 
-    private string playerSide = player1Name;
-    private string winner;
-    private int moveCount;
-    #endregion
+        private string playerSide = player1Name;
+        private string winner;
+        private int moveCount;
+        #endregion
 
-    #region METHOD - PUBLIC
-    public string GetPlayerSide()
-    {
-        return playerSide;
-    }
-
-    public string GetComputerSide()
-    {
-        return computerSide;
-    }
-
-    public void EndTurn()
-    {
-        moveCount++;
-
-        if (CheckWin())
+        #region METHOD - PUBLIC
+        public string GetPlayerSide()
         {
-            EndGame(winner + winText);
+            return playerSide;
         }
-        else if (moveCount >= maxMoveCount)
-        {
-            EndGame(drawText);
-        }
-        else
-        {
-            ChangeSides();
 
-            if (!MultiPlayerMode && !PlayerMove)
+        public string GetComputerSide()
+        {
+            return computerSide;
+        }
+
+        public void EndTurn()
+        {
+            moveCount++;
+
+            if (CheckWin())
             {
-                StartCoroutine(StartComputerTurn());
+                EndGame(winner + winText);
             }
-        }
-    }
-
-    public void StartGameSingle()
-    {
-        StartGame(false);
-    }
-
-    public void StartGamePvP()
-    {
-        StartGame(true);
-    }
-
-    public void EndGame(string endText)
-    {
-        EnableBoard(false);
-
-        EnableGameOverPanel(true);
-
-        gameOverText.text = endText;
-    }
-
-    public void RestartGame()
-    {
-        winner = "";
-        playerSide = player1Name;
-        moveCount = 0;
-        EnableGameOverPanel(false);
-        EnablePlayerIndicator(false);
-
-        EnableBoard(true);
-
-        ResetPlayerColors();
-
-        EnableGameStartPanel(true);
-
-        MultiPlayerMode = false;
-    }
-    #endregion
-
-    #region METHOD - MONOBEHAVIOUR
-    private void Awake()
-    {
-        EnableGameStartPanel(true);
-        EnableGameOverPanel(false);
-        EnablePlayerIndicator(false);
-
-        InitButtons();
-
-        ResetPlayerColors();
-
-        PlayerMove = true;
-    }
-    #endregion
-
-    #region METHOD - PRIVATE
-    private void StartGame(bool multiPlayer)
-    {
-        MultiPlayerMode = multiPlayer;
-
-        EnableGameStartPanel(false);
-        EnablePlayerIndicator(true);
-
-        EnableBoard(true);
-    }
-
-    private void SetPlayerColors(Player newPlayer, Player oldPlayer)
-    {
-        newPlayer.panel.color = activePlayerColor.panelColor;
-        newPlayer.text.color = activePlayerColor.textColor;
-
-        oldPlayer.panel.color = inactivePlayerColor.panelColor;
-        oldPlayer.text.color = inactivePlayerColor.textColor;
-    }
-
-    private void ResetPlayerColors()
-    {
-        SetPlayerColors(playerX, playerO);
-    }
-
-    private void EnableBoard(bool enable)
-    {
-        for (int i = 0; i < buttonLabelList.Length; i++)
-        {
-            buttonLabelList[i].GetComponentInParent<Button>().interactable = enable;
-
-            if(enable)
+            else if (moveCount >= maxMoveCount)
             {
-                buttonLabelList[i].text = "";
+                EndGame(drawText);
             }
-        }
-    }
-
-    private void EnableGameStartPanel(bool enable)
-    {
-        gameStartPanel.SetActive(enable);
-    }
-
-    private void EnableGameOverPanel(bool enable)
-    {
-        gameOverPanel.SetActive(enable);
-    }
-
-    private void EnablePlayerIndicator(bool enable)
-    {
-        playerIndicator.SetActive(enable);
-    }
-
-    private void InitButtons()
-    {
-        for (int i = 0; i < buttonLabelList.Length; i++)
-        {
-            buttonLabelList[i].GetComponentInParent<GridSpace>().SetGameController(this);
-        }
-    }
-
-    private bool CheckWin()
-    {
-        var keys = winDict.Keys.ToArray();
-
-        foreach(var key in keys)
-        {
-            if (winDict.ContainsKey(key))
+            else
             {
-                var values = winDict[key];
-                if (buttonLabelList[values[0]].text == playerSide
-                    && buttonLabelList[values[1]].text == playerSide
-                    && buttonLabelList[values[2]].text == playerSide)
+                ChangeSides();
+
+                if (!MultiPlayerMode && !PlayerMove)
                 {
-                    Debug.Log(playerSide + " won by: " + key);
-
-                    winner = playerSide;
-
-                    return true;
+                    StartCoroutine(StartComputerTurn());
                 }
+            }
+        }
 
-                if(!MultiPlayerMode)
+        public void StartGameSingle()
+        {
+            StartGame(false);
+        }
+
+        public void StartGamePvP()
+        {
+            StartGame(true);
+        }
+
+        public void EndGame(string endText)
+        {
+            EnableBoard(false);
+
+            EnableGameOverPanel(true);
+
+            gameOverText.text = endText;
+        }
+
+        public void RestartGame()
+        {
+            winner = "";
+            playerSide = player1Name;
+            moveCount = 0;
+            MultiPlayerMode = false;
+
+            EnableGameOverPanel(false);
+            EnablePlayerIndicator(false);
+            ResetPlayerColors();
+
+            EnableBoard(true);
+            EnableGameStartPanel(true);
+        }
+        #endregion
+
+        #region METHOD - MONOBEHAVIOUR
+        private void Awake()
+        {
+            EnableGameOverPanel(false);
+            EnablePlayerIndicator(false);
+
+            EnableGameStartPanel(true);
+
+            InitButtons();
+
+            ResetPlayerColors();
+
+            PlayerMove = true;
+        }
+        #endregion
+
+        #region METHOD - PRIVATE
+        private void StartGame(bool multiPlayer)
+        {
+            MultiPlayerMode = multiPlayer;
+
+            EnableGameStartPanel(false);
+            EnablePlayerIndicator(true);
+
+            EnableBoard(true);
+        }
+
+        private void SetPlayerColors(Player newPlayer, Player oldPlayer)
+        {
+            newPlayer.panel.color = activePlayerColor.panelColor;
+            newPlayer.text.color = activePlayerColor.textColor;
+
+            oldPlayer.panel.color = inactivePlayerColor.panelColor;
+            oldPlayer.text.color = inactivePlayerColor.textColor;
+        }
+
+        private void ResetPlayerColors()
+        {
+            SetPlayerColors(playerX, playerO);
+        }
+
+        private void EnableBoard(bool enable)
+        {
+            for (int i = 0; i < buttonLabelList.Length; i++)
+            {
+                buttonLabelList[i].GetComponentInParent<Button>().interactable = enable;
+
+                if (enable)
                 {
-                    if (buttonLabelList[values[0]].text == computerSide
-                        && buttonLabelList[values[1]].text == computerSide
-                        && buttonLabelList[values[2]].text == computerSide)
-                    {
-                        Debug.Log(computerSide + " won by: " + key);
+                    buttonLabelList[i].text = "";
+                }
+            }
+        }
 
-                        winner = computerSide;
+        private void EnableGameStartPanel(bool enable)
+        {
+            gameStartPanel.SetActive(enable);
+        }
+
+        private void EnableGameOverPanel(bool enable)
+        {
+            gameOverPanel.SetActive(enable);
+        }
+
+        private void EnablePlayerIndicator(bool enable)
+        {
+            playerIndicator.SetActive(enable);
+        }
+
+        private void InitButtons()
+        {
+            for (int i = 0; i < buttonLabelList.Length; i++)
+            {
+                buttonLabelList[i].GetComponentInParent<GridSpace>().SetGameController(this);
+            }
+        }
+
+        private bool CheckWin()
+        {
+            var keys = winDict.Keys.ToArray();
+
+            foreach (var key in keys)
+            {
+                if (winDict.ContainsKey(key))
+                {
+                    var values = winDict[key];
+                    if (buttonLabelList[values[0]].text == playerSide
+                        && buttonLabelList[values[1]].text == playerSide
+                        && buttonLabelList[values[2]].text == playerSide)
+                    {
+                        Debug.Log(playerSide + " won by: " + key);
+
+                        winner = playerSide;
 
                         return true;
                     }
+
+                    if (!MultiPlayerMode)
+                    {
+                        if (buttonLabelList[values[0]].text == computerSide
+                            && buttonLabelList[values[1]].text == computerSide
+                            && buttonLabelList[values[2]].text == computerSide)
+                        {
+                            Debug.Log(computerSide + " won by: " + key);
+
+                            winner = computerSide;
+
+                            return true;
+                        }
+                    }
                 }
             }
+
+            return false;
         }
 
-        return false;
-    }
-
-    private void ChangeSides()
-    {
-        if (MultiPlayerMode)
+        private void ChangeSides()
         {
-            playerSide = playerSide == player1Name ? player2Name : player1Name;
-        }
-
-        PlayerMove = !PlayerMove;
-
-        if(PlayerMove == true)
-        {
-            ResetPlayerColors();
-        }
-        else
-        {
-            SetPlayerColors(playerO, playerX);
-        }
-    }
-
-    private IEnumerator StartComputerTurn()
-    {
-        yield return new WaitForSeconds(computerMoveDelaySeconds);
-
-        if (!MultiPlayerMode && !PlayerMove)
-        {
-            var spaceFound = false;
-            while (!spaceFound)
+            if (MultiPlayerMode)
             {
-                var randomIndex = Random.Range(0, maxMoveCount - 1);
-                if (buttonLabelList[randomIndex].GetComponentInParent<Button>().interactable)
-                {
-                    spaceFound = true;
+                playerSide = playerSide == player1Name ? player2Name : player1Name;
+            }
 
-                    buttonLabelList[randomIndex].text = GetComputerSide();
-                    buttonLabelList[randomIndex].GetComponentInParent<Button>().interactable = false;
-                    EndTurn();
-                }
+            PlayerMove = !PlayerMove;
 
-                yield return new WaitForEndOfFrame();
+            if (PlayerMove)
+            {
+                ResetPlayerColors();
+            }
+            else
+            {
+                SetPlayerColors(playerO, playerX);
             }
         }
 
-        yield return null;
+        private IEnumerator StartComputerTurn()
+        {
+            yield return new WaitForSeconds(computerMoveDelaySeconds);
+
+            if (!MultiPlayerMode && !PlayerMove)
+            {
+                var spaceFound = false;
+                while (!spaceFound)
+                {
+                    var randomIndex = Random.Range(0, maxMoveCount - 1);
+                    if (buttonLabelList[randomIndex].GetComponentInParent<Button>().interactable)
+                    {
+                        spaceFound = true;
+
+                        buttonLabelList[randomIndex].text = GetComputerSide();
+                        buttonLabelList[randomIndex].GetComponentInParent<Button>().interactable = false;
+
+                        EndTurn();
+                    }
+
+                    yield return new WaitForEndOfFrame();
+                }
+            }
+
+            yield return null;
+        }
+        #endregion
     }
-    #endregion
 }
