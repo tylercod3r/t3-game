@@ -28,8 +28,10 @@ public class GameController : MonoBehaviour
     public PlayerColor activePlayerColor;
     public PlayerColor inactivePlayerColor;
 
+    [SerializeField] private GameObject gameStartPanel;
     [SerializeField] private GameObject gameOverPanel;
     [SerializeField] private TMP_Text gameOverText;
+    [SerializeField] private GameObject playerIndicator;
 
     [SerializeField] private Player playerX;
     [SerializeField] private Player playerO;
@@ -85,6 +87,14 @@ public class GameController : MonoBehaviour
         }
     }
 
+    public void StartGame()
+    {
+        EnableGameStartPanel(false);
+        EnablePlayerIndicator(true);
+
+        EnableBoard(true);
+    }
+
     public void EndGame(string endText)
     {
         EnableBoard(false);
@@ -98,18 +108,23 @@ public class GameController : MonoBehaviour
     {
         playerSide = player1Name;
         moveCount = 0;
-        gameOverPanel.SetActive(false);
+        EnableGameOverPanel(false);
+        EnablePlayerIndicator(false);
 
         EnableBoard(true);
 
         ResetPlayerColors();
+
+        EnableGameStartPanel(true);
     }
     #endregion
 
     #region METHOD - MONOBEHAVIOUR
     private void Awake()
     {
+        EnableGameStartPanel(true);
         EnableGameOverPanel(false);
+        EnablePlayerIndicator(false);
 
         InitButtons();
 
@@ -145,9 +160,19 @@ public class GameController : MonoBehaviour
         }
     }
 
+    private void EnableGameStartPanel(bool enable)
+    {
+        gameStartPanel.SetActive(enable);
+    }
+
     private void EnableGameOverPanel(bool enable)
     {
         gameOverPanel.SetActive(enable);
+    }
+
+    private void EnablePlayerIndicator(bool enable)
+    {
+        playerIndicator.SetActive(enable);
     }
 
     private void InitButtons()
