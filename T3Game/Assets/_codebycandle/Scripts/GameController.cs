@@ -23,11 +23,13 @@ namespace Codebycandle.T3Game
         public Color textColor;
     }
 
-    public class GameController : MonoBehaviour
+    public class GameController : MonoBehaviour, IGameController
     {
         #region VARIABLE
         public bool MultiPlayerMode { get; private set; }
         public bool PlayerMove { get; private set; }
+
+        [SerializeField] private AudioController audioController;
 
         [SerializeField] private GameObject gameStartPanel;
         [SerializeField] private GameObject gameOverPanel;
@@ -85,13 +87,26 @@ namespace Codebycandle.T3Game
         {
             moveCount++;
 
+            audioController.PlayClickSound();
+
             if (CheckWin())
             {
                 EndGame(winner + winText);
+
+                if (winner == computerSide)
+                {
+                    audioController.PlayLossSound();
+                }
+                else
+                {
+                    audioController.PlayWinSound();
+                }
             }
             else if (moveCount >= maxMoveCount)
             {
                 EndGame(drawText);
+
+                audioController.PlayDrawSound();
             }
             else
             {

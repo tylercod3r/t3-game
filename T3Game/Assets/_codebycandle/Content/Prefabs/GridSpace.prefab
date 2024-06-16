@@ -148,7 +148,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   button: {fileID: 3453072384045894430}
   buttonText: {fileID: 3587252060566403484}
-  playerSide: X
 --- !u!1 &4021475061688794588
 GameObject:
   m_ObjectHideFlags: 0
