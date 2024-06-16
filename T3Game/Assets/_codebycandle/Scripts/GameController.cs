@@ -6,13 +6,33 @@ using UnityEngine;
 using UnityEngine.UI;
 #endregion
 
+[System.Serializable]
+public class Player
+{
+    public Image panel;
+    public TMP_Text text;
+}
+
+[System.Serializable]
+public class PlayerColor
+{
+    public Color panelColor;
+    public Color textColor;
+}
+
 public class GameController : MonoBehaviour
 {
     #region VARIABLE
     public TMP_Text[] buttonLabelList;
 
+    public PlayerColor activePlayerColor;
+    public PlayerColor inactivePlayerColor;
+
     [SerializeField] private GameObject gameOverPanel;
     [SerializeField] private TMP_Text gameOverText;
+
+    [SerializeField] private Player playerX;
+    [SerializeField] private Player playerO;
 
     private readonly Dictionary<string, List<int>> winDict = new()
     {
@@ -81,6 +101,8 @@ public class GameController : MonoBehaviour
         gameOverPanel.SetActive(false);
 
         EnableBoard(true);
+
+        ResetPlayerColors();
     }
     #endregion
 
@@ -90,10 +112,26 @@ public class GameController : MonoBehaviour
         EnableGameOverPanel(false);
 
         InitButtons();
+
+        ResetPlayerColors();
     }
     #endregion
 
     #region METHOD - PRIVATE
+    private void SetPlayerColors(Player newPlayer, Player oldPlayer)
+    {
+        newPlayer.panel.color = activePlayerColor.panelColor;
+        newPlayer.text.color = activePlayerColor.textColor;
+
+        oldPlayer.panel.color = inactivePlayerColor.panelColor;
+        oldPlayer.text.color = inactivePlayerColor.textColor;
+    }
+
+    private void ResetPlayerColors()
+    {
+        SetPlayerColors(playerX, playerO);
+    }
+
     private void EnableBoard(bool enable)
     {
         for (int i = 0; i < buttonLabelList.Length; i++)
@@ -146,6 +184,15 @@ public class GameController : MonoBehaviour
     private void ChangeSides()
     {
         playerSide = playerSide == player1Name ? player2Name : player1Name;
+
+        if(playerSide == player1Name)
+        {
+            ResetPlayerColors();
+        }
+        else
+        {
+            SetPlayerColors(playerO, playerX);
+        }
     }
     #endregion
 }
