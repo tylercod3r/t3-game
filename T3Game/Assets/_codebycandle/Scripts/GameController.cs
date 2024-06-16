@@ -24,6 +24,9 @@ public class PlayerColor
 public class GameController : MonoBehaviour
 {
     #region VARIABLE
+    public bool MultiPlayerMode { get; private set; }
+    public bool PlayerMove { get; private set; }
+
     public TMP_Text[] buttonLabelList;
 
     public PlayerColor activePlayerColor;
@@ -51,22 +54,18 @@ public class GameController : MonoBehaviour
         { "diag2", new List<int>(){2, 4, 6 } },
     };
 
-    private readonly string winText = " Wins!";
-    private readonly string drawText = "It's a Draw!";
+    private const string winText = " Wins!";
+    private const string drawText = "It's a Draw!";
     private const string player1Name = "X";
     private const string player2Name = "O";
     private const string computerName = "C";
     private const int maxMoveCount = 9;
     private const int computerMoveDelaySeconds = 1;
-
-    private readonly string computerSide = computerName;
+    private const string computerSide = computerName;
 
     private string playerSide = player1Name;
-    private string winnerSide;
+    private string winner;
     private int moveCount;
-
-    public bool multiPlayerMode;
-    public bool playerMove;
     #endregion
 
     #region METHOD - PUBLIC
@@ -86,7 +85,7 @@ public class GameController : MonoBehaviour
 
         if (CheckWin())
         {
-            EndGame(winnerSide + winText);
+            EndGame(winner + winText);
         }
         else if (moveCount >= maxMoveCount)
         {
@@ -96,7 +95,7 @@ public class GameController : MonoBehaviour
         {
             ChangeSides();
 
-            if (!multiPlayerMode && !playerMove)
+            if (!MultiPlayerMode && !PlayerMove)
             {
                 StartCoroutine(StartComputerTurn());
             }
@@ -124,7 +123,7 @@ public class GameController : MonoBehaviour
 
     public void RestartGame()
     {
-        winnerSide = "";
+        winner = "";
         playerSide = player1Name;
         moveCount = 0;
         EnableGameOverPanel(false);
@@ -136,7 +135,7 @@ public class GameController : MonoBehaviour
 
         EnableGameStartPanel(true);
 
-        multiPlayerMode = false;
+        MultiPlayerMode = false;
     }
     #endregion
 
@@ -151,14 +150,14 @@ public class GameController : MonoBehaviour
 
         ResetPlayerColors();
 
-        playerMove = true;
+        PlayerMove = true;
     }
     #endregion
 
     #region METHOD - PRIVATE
     private void StartGame(bool multiPlayer)
     {
-        multiPlayerMode = multiPlayer;
+        MultiPlayerMode = multiPlayer;
 
         EnableGameStartPanel(false);
         EnablePlayerIndicator(true);
@@ -231,12 +230,12 @@ public class GameController : MonoBehaviour
                 {
                     Debug.Log(playerSide + " won by: " + key);
 
-                    winnerSide = playerSide;
+                    winner = playerSide;
 
                     return true;
                 }
 
-                if(!multiPlayerMode)
+                if(!MultiPlayerMode)
                 {
                     if (buttonLabelList[values[0]].text == computerSide
                         && buttonLabelList[values[1]].text == computerSide
@@ -244,7 +243,7 @@ public class GameController : MonoBehaviour
                     {
                         Debug.Log(computerSide + " won by: " + key);
 
-                        winnerSide = computerSide;
+                        winner = computerSide;
 
                         return true;
                     }
@@ -257,14 +256,14 @@ public class GameController : MonoBehaviour
 
     private void ChangeSides()
     {
-        if (multiPlayerMode)
+        if (MultiPlayerMode)
         {
             playerSide = playerSide == player1Name ? player2Name : player1Name;
         }
 
-        playerMove = !playerMove;
+        PlayerMove = !PlayerMove;
 
-        if(playerMove == true)
+        if(PlayerMove == true)
         {
             ResetPlayerColors();
         }
@@ -278,7 +277,7 @@ public class GameController : MonoBehaviour
     {
         yield return new WaitForSeconds(computerMoveDelaySeconds);
 
-        if (!multiPlayerMode && !playerMove)
+        if (!MultiPlayerMode && !PlayerMove)
         {
             var spaceFound = false;
             while (!spaceFound)
