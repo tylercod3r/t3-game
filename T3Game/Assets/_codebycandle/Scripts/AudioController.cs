@@ -2,10 +2,16 @@ using UnityEngine;
 
 public class AudioController:MonoBehaviour, IAudioController
 {
-    [SerializeField] private AudioSource clickSound;
+    [SerializeField] private AudioSource startSound;
     [SerializeField] private AudioSource winSound;
     [SerializeField] private AudioSource lossSound;
     [SerializeField] private AudioSource drawSound;
+    [SerializeField] private AudioSource clickSound;
+
+    public void PlayStartSound()
+    {
+        startSound.Play();
+    }
 
     public void PlayClickSound()
     {

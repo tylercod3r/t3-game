@@ -143,6 +143,7 @@ namespace Codebycandle.T3Game
             winner = "";
             playerSide = player1Name;
             moveCount = 0;
+            PlayerMove = true;
             MultiPlayerMode = false;
 
             EnableGameOverPanel(false);
@@ -179,6 +180,8 @@ namespace Codebycandle.T3Game
             EnablePlayerIndicator(true);
 
             EnableBoard(true);
+
+            audioController.PlayStartSound();
         }
 
         private void SetPlayerColors(Player newPlayer, Player oldPlayer)
