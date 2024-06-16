@@ -1,4 +1,5 @@
 #region IMPORT
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
@@ -52,15 +53,20 @@ public class GameController : MonoBehaviour
 
     private readonly string winText = " Wins!";
     private readonly string drawText = "It's a Draw!";
-
     private const string player1Name = "X";
     private const string player2Name = "O";
-    
+    private const string computerName = "C";
     private const int maxMoveCount = 9;
+    private const int computerMoveDelaySeconds = 1;
+
+    private readonly string computerSide = computerName;
 
     private string playerSide = player1Name;
-
+    private string winnerSide;
     private int moveCount;
+
+    public bool multiPlayerMode;
+    public bool playerMove;
     #endregion
 
     #region METHOD - PUBLIC
@@ -69,13 +75,18 @@ public class GameController : MonoBehaviour
         return playerSide;
     }
 
+    public string GetComputerSide()
+    {
+        return computerSide;
+    }
+
     public void EndTurn()
     {
         moveCount++;
 
         if (CheckWin())
         {
-            EndGame(playerSide + winText);
+            EndGame(winnerSide + winText);
         }
         else if (moveCount >= maxMoveCount)
         {
@@ -84,15 +95,22 @@ public class GameController : MonoBehaviour
         else
         {
             ChangeSides();
+
+            if (!multiPlayerMode && !playerMove)
+            {
+                StartCoroutine(StartComputerTurn());
+            }
         }
     }
 
-    public void StartGame()
+    public void StartGameSingle()
     {
-        EnableGameStartPanel(false);
-        EnablePlayerIndicator(true);
+        StartGame(false);
+    }
 
-        EnableBoard(true);
+    public void StartGamePvP()
+    {
+        StartGame(true);
     }
 
     public void EndGame(string endText)
@@ -106,6 +124,7 @@ public class GameController : MonoBehaviour
 
     public void RestartGame()
     {
+        winnerSide = "";
         playerSide = player1Name;
         moveCount = 0;
         EnableGameOverPanel(false);
@@ -116,6 +135,8 @@ public class GameController : MonoBehaviour
         ResetPlayerColors();
 
         EnableGameStartPanel(true);
+
+        multiPlayerMode = false;
     }
     #endregion
 
@@ -129,10 +150,22 @@ public class GameController : MonoBehaviour
         InitButtons();
 
         ResetPlayerColors();
+
+        playerMove = true;
     }
     #endregion
 
     #region METHOD - PRIVATE
+    private void StartGame(bool multiPlayer)
+    {
+        multiPlayerMode = multiPlayer;
+
+        EnableGameStartPanel(false);
+        EnablePlayerIndicator(true);
+
+        EnableBoard(true);
+    }
+
     private void SetPlayerColors(Player newPlayer, Player oldPlayer)
     {
         newPlayer.panel.color = activePlayerColor.panelColor;
@@ -198,7 +231,23 @@ public class GameController : MonoBehaviour
                 {
                     Debug.Log(playerSide + " won by: " + key);
 
+                    winnerSide = playerSide;
+
                     return true;
+                }
+
+                if(!multiPlayerMode)
+                {
+                    if (buttonLabelList[values[0]].text == computerSide
+                        && buttonLabelList[values[1]].text == computerSide
+                        && buttonLabelList[values[2]].text == computerSide)
+                    {
+                        Debug.Log(computerSide + " won by: " + key);
+
+                        winnerSide = computerSide;
+
+                        return true;
+                    }
                 }
             }
         }
@@ -208,9 +257,14 @@ public class GameController : MonoBehaviour
 
     private void ChangeSides()
     {
-        playerSide = playerSide == player1Name ? player2Name : player1Name;
+        if (multiPlayerMode)
+        {
+            playerSide = playerSide == player1Name ? player2Name : player1Name;
+        }
 
-        if(playerSide == player1Name)
+        playerMove = !playerMove;
+
+        if(playerMove == true)
         {
             ResetPlayerColors();
         }
@@ -218,6 +272,32 @@ public class GameController : MonoBehaviour
         {
             SetPlayerColors(playerO, playerX);
         }
+    }
+
+    private IEnumerator StartComputerTurn()
+    {
+        yield return new WaitForSeconds(computerMoveDelaySeconds);
+
+        if (!multiPlayerMode && !playerMove)
+        {
+            var spaceFound = false;
+            while (!spaceFound)
+            {
+                var randomIndex = Random.Range(0, maxMoveCount - 1);
+                if (buttonLabelList[randomIndex].GetComponentInParent<Button>().interactable)
+                {
+                    spaceFound = true;
+
+                    buttonLabelList[randomIndex].text = GetComputerSide();
+                    buttonLabelList[randomIndex].GetComponentInParent<Button>().interactable = false;
+                    EndTurn();
+                }
+
+                yield return new WaitForEndOfFrame();
+            }
+        }
+
+        yield return null;
     }
     #endregion
 }

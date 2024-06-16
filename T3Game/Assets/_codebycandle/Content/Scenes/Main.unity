@@ -766,7 +766,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 894155346}
         m_TargetAssemblyTypeName: GameController, Assembly-CSharp
-        m_MethodName: StartGame
+        m_MethodName: StartGamePvP
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1394,6 +1394,8 @@ MonoBehaviour:
   playerO:
     panel: {fileID: 241951649}
     text: {fileID: 814469341}
+  playerMove: 0
+  delay: 10
 --- !u!1 &906796200
 GameObject:
   m_ObjectHideFlags: 0
@@ -1751,7 +1753,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 894155346}
         m_TargetAssemblyTypeName: GameController, Assembly-CSharp
-        m_MethodName: StartGame
+        m_MethodName: StartGameSingle
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -2056,7 +2058,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1161351399
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2251,7 +2253,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: PVP
+  m_text: PvP
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}

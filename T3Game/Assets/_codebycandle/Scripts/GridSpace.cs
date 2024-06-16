@@ -16,6 +16,8 @@ public class GridSpace:MonoBehaviour
     #region METHOD - PUBLIC
     public void SetSpace()
     {
+        if (!gameController.multiPlayerMode && !gameController.playerMove) return;
+        
         buttonText.text = gameController.GetPlayerSide();
         button.interactable = false;
         gameController.EndTurn();
