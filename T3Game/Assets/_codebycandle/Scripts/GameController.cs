@@ -30,9 +30,11 @@ namespace Codebycandle.T3Game
         public bool PlayerMove { get; private set; }
 
         [SerializeField] private AudioController audioController;
+        [SerializeField] private WinOverlayController winOverlayController;
 
         [SerializeField] private GameObject gameStartPanel;
         [SerializeField] private GameObject gameOverPanel;
+        [SerializeField] private GameObject winOverlayPanel;
         [SerializeField] private TMP_Text gameOverText;
         [SerializeField] private GameObject playerIndicator;
 
@@ -45,18 +47,18 @@ namespace Codebycandle.T3Game
         [SerializeField] private PlayerColor inactivePlayerColor;
 
         private readonly Dictionary<string, List<int>> winDict = new()
-    {
-        { "row1", new List<int>(){0, 1, 2 } },
-        { "row2", new List<int>(){3, 4, 5 } },
-        { "row3", new List<int>(){6, 7, 8 } },
+        {
+            { "row1", new List<int>(){0, 1, 2 } },
+            { "row2", new List<int>(){3, 4, 5 } },
+            { "row3", new List<int>(){6, 7, 8 } },
 
-        { "col1", new List<int>(){0, 3, 6 } },
-        { "col2", new List<int>(){1, 4, 7 } },
-        { "col3", new List<int>(){2, 5, 8 } },
+            { "col1", new List<int>(){0, 3, 6 } },
+            { "col2", new List<int>(){1, 4, 7 } },
+            { "col3", new List<int>(){2, 5, 8 } },
 
-        { "diag1", new List<int>(){0, 4, 8 } },
-        { "diag2", new List<int>(){2, 4, 6 } },
-    };
+            { "diag1", new List<int>(){0, 4, 8 } },
+            { "diag2", new List<int>(){2, 4, 6 } },
+        };
 
         private const string winText = " Wins!";
         private const string drawText = "It's a Draw!";
@@ -147,6 +149,7 @@ namespace Codebycandle.T3Game
             MultiPlayerMode = false;
 
             EnableGameOverPanel(false);
+            winOverlayController.EnablePanel(false);
             EnablePlayerIndicator(false);
             ResetPlayerColors();
 
@@ -160,6 +163,7 @@ namespace Codebycandle.T3Game
         {
             EnableGameOverPanel(false);
             EnablePlayerIndicator(false);
+            winOverlayController.EnablePanel(false);
 
             EnableGameStartPanel(true);
 
@@ -251,6 +255,8 @@ namespace Codebycandle.T3Game
 
                         winner = playerSide;
 
+                        winOverlayController.DrawWin(values[0], values[2]);
+
                         return true;
                     }
 
@@ -263,6 +269,8 @@ namespace Codebycandle.T3Game
                             Debug.Log(computerSide + " won by: " + key);
 
                             winner = computerSide;
+
+                            winOverlayController.DrawWin(values[0], values[2]);
 
                             return true;
                         }
