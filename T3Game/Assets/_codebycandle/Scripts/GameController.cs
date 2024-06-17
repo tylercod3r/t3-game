@@ -35,8 +35,9 @@ namespace Codebycandle.T3Game
         [SerializeField] private GameObject gameStartPanel;
         [SerializeField] private GameObject gameOverPanel;
         [SerializeField] private GameObject winOverlayPanel;
-        [SerializeField] private TMP_Text gameOverText;
         [SerializeField] private GameObject playerIndicator;
+        [SerializeField] private TMP_Text gameOverText;
+        [SerializeField] private TMP_Text gameModeText;
 
         [SerializeField] private Player playerX;
         [SerializeField] private Player playerO;
@@ -143,6 +144,7 @@ namespace Codebycandle.T3Game
         public void RestartGame()
         {
             winner = "";
+            SetGameModeText("");
             playerSide = player1Name;
             moveCount = 0;
             PlayerMove = true;
@@ -173,6 +175,11 @@ namespace Codebycandle.T3Game
 
             PlayerMove = true;
         }
+
+        private void Start()
+        {
+            SetGameModeText("");
+        }
         #endregion
 
         #region METHOD - PRIVATE
@@ -184,6 +191,8 @@ namespace Codebycandle.T3Game
             EnablePlayerIndicator(true);
 
             EnableBoard(true);
+
+            SetGameModeText(multiPlayer ? "2P" : "1P");
 
             audioController.PlayStartSound();
         }
@@ -228,6 +237,11 @@ namespace Codebycandle.T3Game
         private void EnablePlayerIndicator(bool enable)
         {
             playerIndicator.SetActive(enable);
+        }
+
+        private void SetGameModeText(string text)
+        {
+            gameModeText.text = text;
         }
 
         private void InitButtons()
