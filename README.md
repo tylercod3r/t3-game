@@ -1,2 +1,2 @@
 # t3-game
-TicTacToe game demo for Illumix.
+TicTacToe game demo in Unity / C#.
