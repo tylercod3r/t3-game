@@ -62,7 +62,7 @@ namespace Codebycandle.T3Game
         private const string drawText = "It's a Draw!";
         private const string player1Name = "X";
         private const string player2Name = "O";
-        private const string computerName = "C";
+        private const string computerName = player2Name;
         private const string computerSide = computerName;
         private const int maxMoveCount = 9;
         private const int computerMoveDelaySeconds = 1;
